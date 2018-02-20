@@ -4,7 +4,7 @@
 gatsby new my-gatsby-blog https://github.com/noahg/gatsby-starter-blog-no-styles
 ```
 
-Then I cleaned up all the styles.
+Then I cleaned up all the styles. Apply this workaround for the error related to `gatsby-cli/lib/reporter`: https://github.com/gatsbyjs/gatsby/issues/4131#issuecomment-366766479
 
 2. Install firebase as dependency
 
@@ -16,7 +16,7 @@ npm install firebase --save
 
 4. Create the app in firebase. Choose the github authentication, and copy the callback for oauth. Open another tab and register new app in github: https://github.com/settings/applications/new. For the callback field, fill the url copied from firebase. Then copy the client_id and token to firebase to complete the github setup.
 
-5. Create the config file with the firebase info.
+5. Create the config file with the firebase configuration info.
 
 6. Install redux and react-redux:
 
