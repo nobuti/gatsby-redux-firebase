@@ -3,16 +3,19 @@ module.exports = {
     title: 'Product Blog',
     author: 'Kyle Mathews',
     description: 'A starter blog demonstrating what Gatsby can do.',
-    siteUrl: 'https://gatsbyjs.github.io/gatsby-starter-blog/',
+    siteUrl: 'https://gatsbyjs.github.io/gatsby-starter-blog/'
   },
-  pathPrefix: '/gatsby-starter-blog',
+  mapping: {
+    'MarkdownRemark.frontmatter.author': 'AuthorYaml'
+  },
   plugins: [
+    { resolve: 'gatsby-transformer-authors-yaml' },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
         path: `${__dirname}/src/pages`,
-        name: 'pages',
-      },
+        name: 'pages'
+      }
     },
     {
       resolve: `gatsby-transformer-remark`,
@@ -21,20 +24,20 @@ module.exports = {
           {
             resolve: `gatsby-remark-images`,
             options: {
-              maxWidth: 590,
-            },
+              maxWidth: 590
+            }
           },
           {
             resolve: `gatsby-remark-responsive-iframe`,
             options: {
-              wrapperStyle: `margin-bottom: 1.0725rem`,
-            },
+              wrapperStyle: `margin-bottom: 1.0725rem`
+            }
           },
           'gatsby-remark-prismjs',
           'gatsby-remark-copy-linked-files',
-          'gatsby-remark-smartypants',
-        ],
-      },
+          'gatsby-remark-smartypants'
+        ]
+      }
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
@@ -42,10 +45,10 @@ module.exports = {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
         //trackingId: `ADD YOUR TRACKING ID HERE`,
-      },
+      }
     },
     `gatsby-plugin-feed`,
     `gatsby-plugin-offline`,
-    `gatsby-plugin-react-helmet`,
-  ],
+    `gatsby-plugin-react-helmet`
+  ]
 };

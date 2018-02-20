@@ -15,6 +15,16 @@ class BlogPostTemplate extends Component {
         <Helmet title={`${post.frontmatter.title} | ${siteTitle}`} />
         <h1>{post.frontmatter.title}</h1>
         <p>{post.frontmatter.date}</p>
+
+        {post.frontmatter.author &&
+          [<span key="by">By</span>].concat(
+            post.frontmatter.author.map(author => (
+              <span key={author.frontmatter.name}>
+                {author.frontmatter.name}
+              </span>
+            ))
+          )}
+
         <div dangerouslySetInnerHTML={{ __html: post.html }} />
         <hr />
 
@@ -47,7 +57,6 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         title
-        author
       }
     }
     markdownRemark(fields: { slug: { eq: $slug } }) {
@@ -56,6 +65,12 @@ export const pageQuery = graphql`
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")
+        author {
+          frontmatter {
+            name
+            url
+          }
+        }
       }
     }
   }

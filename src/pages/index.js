@@ -22,6 +22,16 @@ class BlogIndex extends Component {
                 <Link to={node.fields.slug}>{title}</Link>
               </h3>
               <small>{node.frontmatter.date}</small>
+              <div>
+                {node.frontmatter.author &&
+                  [<span key="by">By</span>].concat(
+                    node.frontmatter.author.map(author => (
+                      <span key={author.frontmatter.name}>
+                        {author.frontmatter.name}
+                      </span>
+                    ))
+                  )}
+              </div>
               <p dangerouslySetInnerHTML={{ __html: node.excerpt }} />
             </div>
           );
@@ -50,6 +60,12 @@ export const pageQuery = graphql`
           frontmatter {
             date(formatString: "DD MMMM, YYYY")
             title
+            author {
+              frontmatter {
+                name
+                url
+              }
+            }
           }
         }
       }
