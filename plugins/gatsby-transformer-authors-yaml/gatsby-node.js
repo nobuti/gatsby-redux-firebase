@@ -25,9 +25,9 @@ exports.sourceNodes = ({ graphql, boundActionCreators }) => {
       parent: 'AUTHORS',
       internal: {
         type: 'AuthorYaml',
-        contentDigest: JSON.stringify(author),
+        contentDigest: JSON.stringify(author)
       },
-      frontmatter: author,
+      frontmatter: author
     });
   });
 };
