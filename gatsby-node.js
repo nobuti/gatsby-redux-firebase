@@ -4,11 +4,12 @@ const path = require('path');
 const { createFilePath } = require('gatsby-source-filesystem');
 
 exports.createPages = ({ graphql, boundActionCreators }) => {
-  const { createPage } = boundActionCreators;
+  const { createPage, createNodeField } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
     const blogPost = path.resolve('./src/templates/blog-post.js');
     const tagTemplate = path.resolve('src/templates/tags.js');
+    const authorTemplate = path.resolve('src/templates/authors.js');
     resolve(
       graphql(
         `
@@ -21,6 +22,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
                 node {
                   fields {
                     slug
+                    authors
                   }
                   frontmatter {
                     title
@@ -59,6 +61,30 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
           });
         });
 
+        // Author pages:
+        let authors = [];
+        // Iterate through each post, putting all found author into `authors`
+        _.each(posts, edge => {
+          const postAuthor = edge.node.fields.authors;
+          if (postAuthor) {
+            authors = authors.concat(postAuthor);
+          }
+        });
+
+        // Eliminate duplicate authors
+        authors = _.uniq(authors);
+
+        // Make author pages
+        authors.forEach(author => {
+          createPage({
+            path: `/authors/${_.kebabCase(author)}/`,
+            component: authorTemplate,
+            context: {
+              author
+            }
+          });
+        });
+
         // Tag pages:
         let tags = [];
         // Iterate through each post, putting all found tags into `tags`
@@ -90,6 +116,14 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
 
   if (node.internal.type === `MarkdownRemark`) {
     const value = createFilePath({ node, getNode });
+    const author = _.map(node.frontmatter.author, author => author.trim());
+
+    createNodeField({
+      name: `authors`,
+      node,
+      value: author
+    });
+
     createNodeField({
       name: `slug`,
       node,

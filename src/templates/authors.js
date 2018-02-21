@@ -4,19 +4,20 @@ import PropTypes from 'prop-types';
 // Components
 import Link from 'gatsby-link';
 
-const Tags = ({ pathContext, data }) => {
-  const { tag } = pathContext;
+const Authors = ({ pathContext, data }) => {
+  console.log(data.allMarkdownRemark);
+
+  const { author } = pathContext;
   const { edges, totalCount } = data.allMarkdownRemark;
   const tagHeader = `${totalCount} post${
     totalCount === 1 ? '' : 's'
-  } tagged with "${tag}"`;
+  } written by "${author}"`;
 
   return (
     <div>
       <h1>{tagHeader}</h1>
       <ul>
         {edges.map(({ node }) => {
-          console.log(node);
           const { title } = node.frontmatter;
           const { slug } = node.fields;
           return (
@@ -30,9 +31,9 @@ const Tags = ({ pathContext, data }) => {
   );
 };
 
-Tags.propTypes = {
+Authors.propTypes = {
   pathContext: PropTypes.shape({
-    tag: PropTypes.string.isRequired
+    author: PropTypes.string.isRequired
   }),
   data: PropTypes.shape({
     allMarkdownRemark: PropTypes.shape({
@@ -50,14 +51,14 @@ Tags.propTypes = {
   })
 };
 
-export default Tags;
+export default Authors;
 
 export const pageQuery = graphql`
-  query TagPage($tag: String) {
+  query AuthorPage($author: String) {
     allMarkdownRemark(
       limit: 2000
       sort: { fields: [frontmatter___date], order: DESC }
-      filter: { frontmatter: { tags: { in: [$tag] } } }
+      filter: { fields: { authors: { eq: $author } } }
     ) {
       totalCount
       edges {
@@ -67,6 +68,12 @@ export const pageQuery = graphql`
           }
           frontmatter {
             title
+            author {
+              id
+              frontmatter {
+                name
+              }
+            }
           }
         }
       }
