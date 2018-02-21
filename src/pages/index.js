@@ -32,6 +32,14 @@ class BlogIndex extends Component {
                     ))
                   )}
               </div>
+              <div>
+                {node.frontmatter.tags &&
+                  node.frontmatter.tags.map(tag => (
+                    <a key={tag} href={`/tags/${tag}`}>
+                      {tag}
+                    </a>
+                  ))}
+              </div>
               <p dangerouslySetInnerHTML={{ __html: node.excerpt }} />
             </div>
           );
@@ -66,6 +74,7 @@ export const pageQuery = graphql`
                 url
               }
             }
+            tags
           }
         }
       }
