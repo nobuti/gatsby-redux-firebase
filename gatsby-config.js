@@ -5,40 +5,7 @@ module.exports = {
     description: 'A starter blog demonstrating what Gatsby can do.',
     siteUrl: 'https://gatsbyjs.github.io/gatsby-starter-blog/'
   },
-  mapping: {
-    'MarkdownRemark.frontmatter.author': 'AuthorYaml'
-  },
   plugins: [
-    { resolve: 'gatsby-transformer-authors-yaml' },
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `${__dirname}/src/pages`,
-        name: 'pages'
-      }
-    },
-    {
-      resolve: `gatsby-transformer-remark`,
-      options: {
-        plugins: [
-          {
-            resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 590
-            }
-          },
-          {
-            resolve: `gatsby-remark-responsive-iframe`,
-            options: {
-              wrapperStyle: `margin-bottom: 1.0725rem`
-            }
-          },
-          'gatsby-remark-prismjs',
-          'gatsby-remark-copy-linked-files',
-          'gatsby-remark-smartypants'
-        ]
-      }
-    },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
@@ -49,6 +16,30 @@ module.exports = {
     },
     `gatsby-plugin-feed`,
     `gatsby-plugin-offline`,
-    `gatsby-plugin-react-helmet`
+    `gatsby-plugin-react-helmet`,
+    {
+      resolve: 'gatsby-source-wordpress',
+      options: {
+        /*
+        * The base URL of the Wordpress site without the trailingslash and the protocol. This is required.
+        * Example : 'gatsbyjsexamplewordpress.wordpress.com' or 'www.example-site.com'
+        */
+        baseUrl: 'cartogatsby.wordpress.com',
+        protocol: 'http',
+        hostingWPCOM: true,
+        useACF: false,
+        auth: {
+          // If hostingWPCOM is true then you will need to communicate with wordpress.com API
+          // in order to do that you need to create an app (of type Web) at https://developer.wordpress.com/apps/
+          // then add your clientId, clientSecret, username, and password here
+          wpcom_app_clientSecret:
+            'n4Y5QISYg2CYdE9vPLJzrQvqWpqk2GsTdwBpoBqvml2iUmbyc4LrLtS5hpMQLoUe',
+          wpcom_app_clientId: '57258',
+          wpcom_user: 'buti@cartodb.com',
+          wpcom_pass: 'golondrina'
+        },
+        verboseOutput: false
+      }
+    }
   ]
 };

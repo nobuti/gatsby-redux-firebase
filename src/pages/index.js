@@ -8,38 +8,30 @@ import withAuthorization from '../components/Auth/withAuthorization';
 class BlogIndex extends Component {
   render() {
     const siteTitle = get(this, 'props.data.site.siteMetadata.title');
-    const posts = get(this, 'props.data.allMarkdownRemark.edges');
+    const posts = get(this, 'props.data.allWordpressPost.edges');
 
     return (
       <div>
         <Helmet title={siteTitle} />
 
         {posts.map(({ node }) => {
-          const title = get(node, 'frontmatter.title') || node.fields.slug;
+          const title = node.title;
           return (
-            <div key={node.fields.slug}>
+            <div key={node.slug}>
               <h3>
-                <Link to={node.fields.slug}>{title}</Link>
+                <Link
+                  to={node.slug}
+                  dangerouslySetInnerHTML={{ __html: node.title }}
+                />
               </h3>
-              <small>{node.frontmatter.date}</small>
+              <small>{node.date}</small>
               <div>
-                {node.frontmatter.author &&
-                  [<span key="by">By</span>].concat(
-                    node.frontmatter.author.map(author => {
-                      return (
-                        <a
-                          key={author.frontmatter.name}
-                          href={`/authors/${node.fields.authors}`}
-                        >
-                          {author.frontmatter.name}
-                        </a>
-                      );
-                    })
-                  )}
+                by{' '}
+                <a href={`/authors/${node.author.slug}`}>{node.author.name}</a>
               </div>
               <div>
-                {node.frontmatter.tags &&
-                  node.frontmatter.tags.map(tag => (
+                {node.tags &&
+                  node.tags.map(tag => (
                     <a key={tag} href={`/tags/${tag}`}>
                       {tag}
                     </a>
@@ -63,24 +55,17 @@ export const pageQuery = graphql`
         title
       }
     }
-    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    allWordpressPost(sort: { fields: [date] }) {
       edges {
         node {
+          title
           excerpt
-          fields {
+          slug
+          date(formatString: "DD MMMM, YYYY")
+          content
+          author {
+            name
             slug
-            authors
-          }
-          frontmatter {
-            date(formatString: "DD MMMM, YYYY")
-            title
-            author {
-              frontmatter {
-                name
-                url
-              }
-            }
-            tags
           }
         }
       }

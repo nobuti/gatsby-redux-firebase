@@ -1,35 +1,34 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 const path = require('path');
-const { createFilePath } = require('gatsby-source-filesystem');
+const slash = require(`slash`);
+// const { createFilePath } = require('gatsby-source-filesystem');
 
 exports.createPages = ({ graphql, boundActionCreators }) => {
   const { createPage, createNodeField } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
-    const blogPost = path.resolve('./src/templates/blog-post.js');
+    const postTemplate = path.resolve('./src/templates/post.js');
     const tagTemplate = path.resolve('src/templates/tags.js');
     const authorTemplate = path.resolve('src/templates/authors.js');
+
     resolve(
       graphql(
         `
           {
-            allMarkdownRemark(
-              sort: { fields: [frontmatter___date], order: DESC }
-              limit: 1000
-            ) {
+            allWordpressPost {
               edges {
                 node {
-                  fields {
+                  id
+                  slug
+                  status
+                  tags {
+                    name
                     slug
-                    authors
                   }
-                  frontmatter {
-                    title
-                    tags
-                    author {
-                      id
-                    }
+                  author {
+                    name
+                    slug
                   }
                 }
               }
@@ -42,21 +41,13 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
           reject(result.errors);
         }
 
-        // Create blog posts pages.
-        const posts = result.data.allMarkdownRemark.edges;
-
-        _.each(posts, (post, index) => {
-          const previous =
-            index === posts.length - 1 ? false : posts[index + 1].node;
-          const next = index === 0 ? false : posts[index - 1].node;
-
+        const posts = result.data.allWordpressPost.edges;
+        _.each(posts, edge => {
           createPage({
-            path: post.node.fields.slug,
-            component: blogPost,
+            path: `/${edge.node.slug}/`,
+            component: slash(postTemplate),
             context: {
-              slug: post.node.fields.slug,
-              previous,
-              next
+              id: edge.node.id
             }
           });
         });
@@ -65,7 +56,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
         let authors = [];
         // Iterate through each post, putting all found author into `authors`
         _.each(posts, edge => {
-          const postAuthor = edge.node.fields.authors;
+          const postAuthor = edge.node.author.name;
           if (postAuthor) {
             authors = authors.concat(postAuthor);
           }
@@ -89,8 +80,8 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
         let tags = [];
         // Iterate through each post, putting all found tags into `tags`
         _.each(posts, edge => {
-          if (_.get(edge, 'node.frontmatter.tags')) {
-            tags = tags.concat(edge.node.frontmatter.tags);
+          if (edge.node.tags) {
+            tags = tags.concat(edge.node.tags.map(tag => tag.slug));
           }
         });
         // Eliminate duplicate tags
@@ -106,28 +97,21 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
             }
           });
         });
+
+        resolve();
       })
     );
   });
 };
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
-  const { createNodeField } = boundActionCreators;
+// exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
+//   const { createNodeField } = boundActionCreators;
 
-  if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({ node, getNode });
-    const author = _.map(node.frontmatter.author, author => author.trim());
-
-    createNodeField({
-      name: `authors`,
-      node,
-      value: author
-    });
-
-    createNodeField({
-      name: `slug`,
-      node,
-      value
-    });
-  }
-};
+//   if (node.internal.type === `wordpress__POST`) {
+//     createNodeField({
+//       name: `tags`,
+//       node,
+//       value: node.tags___NODE
+//     });
+//   }
+// };
